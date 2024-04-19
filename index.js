@@ -7,7 +7,11 @@ const port = 5000;
 // schema (blueprint)>model>real data---in this flow mongoose can insert data
 const todoSchema = new mongoose.Schema({
   todo: String,
-  priority: String,
+  priority: {
+    type: String,
+    enum: ["high","medium","low"]
+  },
+  isComplete: Boolean
 });
 //model
 const Todo = mongoose.model("Todo", todoSchema);
