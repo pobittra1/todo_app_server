@@ -6,12 +6,19 @@ const port = 5000;
 //mongoose schema
 // schema (blueprint)>model>real data---in this flow mongoose can insert data
 const todoSchema = new mongoose.Schema({
-  todo: String,
+  todo: {
+    type: String,
+    required: true,
+  },
   priority: {
     type: String,
-    enum: ["high","medium","low"]
+    enum: ["high", "medium", "low"],
+    required: true,
   },
-  isComplete: Boolean
+  isComplete: {
+    type: Boolean,
+    required: true,
+  },
 });
 //model
 const Todo = mongoose.model("Todo", todoSchema);
@@ -48,7 +55,12 @@ async function run() {
       const todos = await Todo.find({});
       res.send(todos);
     });
-
+    //get single todo
+    app.get("/todo/:id", async (req, res) => {
+      const id = req.params.id;
+      const todo = await Todo.findById(id);
+      res.send(todo);
+    });
     app.post("/todo", async (req, res) => {
       const todoData = req.body;
       // const todo = await todoCollection.insertOne(todoData);
