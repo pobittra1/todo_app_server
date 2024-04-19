@@ -49,7 +49,7 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-
+    //get all todos
     app.get("/todos", async (req, res) => {
       // const todos = await todoCollection.find({}).toArray();
       const todos = await Todo.find({});
@@ -58,9 +58,16 @@ async function run() {
     //get single todo
     app.get("/todo/:id", async (req, res) => {
       const id = req.params.id;
+      //option 1
       const todo = await Todo.findById(id);
+      //option 2
+      // const todo = await Todo.findOne({
+      //   _id: id,
+      // });
       res.send(todo);
     });
+
+    //post todo
     app.post("/todo", async (req, res) => {
       const todoData = req.body;
       // const todo = await todoCollection.insertOne(todoData);
@@ -69,6 +76,15 @@ async function run() {
       // const todo = new Todo(todoData);
       // todo.save();
       const todo = await Todo.create(todoData);
+      res.send(todo);
+    });
+
+    app.patch("/todo/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      const todo = await Todo.findByIdAndUpdate(id, updatedData, {
+        new: true,
+      });
       res.send(todo);
     });
   } finally {
