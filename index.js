@@ -70,7 +70,16 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
     //get all todos
-    app.get("/todos", async (req, res) => {
+    app.get("/todos",async(req,res,next)=>{
+      const token = req.headers.authorization;
+      const privateKey = "passofpobi";
+      const verifiedToken = jwt.verify(token, privateKey);
+      if(verifiedToken){
+        next();
+      }else{
+        res.send("your token is invalid");
+      }
+    }, async (req, res) => {
       // const todos = await todoCollection.find({}).toArray();
       const todos = await Todo.find({});
       res.send(todos);
@@ -138,17 +147,18 @@ async function run() {
           email: user.email,
         };
         const privateKey = "passofpobi";
-        const expirationTime = "1d";
+        const expirationTime = "2d";
         const accessToken = jwt.sign(payload, privateKey, {
           expiresIn: expirationTime,
         });
         const userResponse = {
           message: "Logged in successfuly",
-          data: {accessToken},
+          data: { accessToken },
         };
         res.send(userResponse);
+      } else {
+        res.send("email or password incorrect!");
       }
-      res.send("email or password incorrect!");
     });
   } finally {
     // Ensures that the client will close when you finish/error
