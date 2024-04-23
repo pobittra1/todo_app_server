@@ -4,7 +4,7 @@ const app = express();
 const port = 5000;
 
 //mongoose schema
-// schema (blueprint)>model>real data---in this flow mongoose can insert data
+//todo schema (blueprint)>model>real data---in this flow mongoose can insert data
 const todoSchema = new mongoose.Schema({
   todo: {
     type: String,
@@ -20,8 +20,27 @@ const todoSchema = new mongoose.Schema({
     required: true,
   },
 });
-//model
+//todoModel
 const Todo = mongoose.model("Todo", todoSchema);
+
+//user schema
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
+
+//userModel
+const User = mongoose.model("User", userSchema);
 //middleware
 app.use(express.json());
 
@@ -86,6 +105,24 @@ async function run() {
         new: true,
       });
       res.send(todo);
+    });
+
+    app.delete("/todo/:id", async (req, res) => {
+      const id = req.params.id;
+      const todos = await Todo.findByIdAndDelete(id);
+      res.send("Deleted successfuly");
+    });
+
+    //post user
+    app.post("/register", async (req, res) => {
+      const userData = req.body;
+      // const user = await userCollection.insertOne(userData);
+
+      //if i don't write tihs code then i will follow code of 55 line number code.
+      // const user = new User(userData);
+      // user.save();
+      const user = await User.create(userData);
+      res.send(user);
     });
   } finally {
     // Ensures that the client will close when you finish/error
