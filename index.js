@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+var jwt = require("jsonwebtoken");
 const app = express();
 const port = 5000;
 
@@ -113,7 +114,7 @@ async function run() {
       res.send("Deleted successfuly");
     });
 
-    //post user
+    //register user
     app.post("/register", async (req, res) => {
       const userData = req.body;
       // const user = await userCollection.insertOne(userData);
@@ -123,6 +124,31 @@ async function run() {
       // user.save();
       const user = await User.create(userData);
       res.send(user);
+    });
+    //login user
+    app.post("/login", async (req, res) => {
+      const { email, password } = req.body;
+      const user = await User.findOne({
+        email,
+        password,
+      });
+      if (user) {
+        const payload = {
+          name: user.name,
+          email: user.email,
+        };
+        const privateKey = "passofpobi";
+        const expirationTime = "1d";
+        const accessToken = jwt.sign(payload, privateKey, {
+          expiresIn: expirationTime,
+        });
+        const userResponse = {
+          message: "Logged in successfuly",
+          data: {accessToken},
+        };
+        res.send(userResponse);
+      }
+      res.send("email or password incorrect!");
     });
   } finally {
     // Ensures that the client will close when you finish/error
